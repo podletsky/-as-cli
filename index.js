@@ -1,34 +1,36 @@
-const contacts = require("././node-CommonJs-module/contacts");
-const { program } = require("commander");
+const contacts = require("./contacts");
+const { Command } = require("commander");
+const program = new Command();
+program
+  .option("-a, --action <action>", "choose action")
+
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
+
+program.parse(process.argv);
+
+const argv = program.opts();
+
 const invokeAction = async ({ action, id, name, email, phone }) => {
   switch (action) {
-    case "read":
-      const listContactId = await contacts.listContacts();
-      return console.log(listContactId);
-    case "getById":
-      const oneContacts = await contacts.getContactById(id);
-      return console.log(oneContacts);
+    case "list":
+      const allContacts = await contacts.listContacts();
+      return console.log(allContacts);
+    case "get":
+      const oneContact = await contacts.getContactById(id);
+      return console.log(oneContact);
     case "add":
-      const newContacts = await contacts.addContact({ id, name, email, phone });
-      return console.log(newContacts);
-    case "deleteById":
-      const deleteContact = await contacts.removeContact(
-        "drsAJ4SHPYqZeG-83QTVW"
-      );
+      const newContact = await contacts.addContact(name, email, phone);
+      return console.log(newContact);
+    case "remove":
+      const deleteContact = await contacts.removeContact(id);
       return console.log(deleteContact);
     default:
-      return console.log("непрацює");
+      console.warn("\x1B[31m Unknown action type!");
   }
+  id;
 };
 
-program
-  .option("-d, --deleteById")
-  .option("-i, --getById, ")
-  .option("-n, --name")
-  .option("-e, --email")
-  .option("-a, --add");
-
-program.parse();
-
-const options = program.opts();
-invokeAction(options);
+invokeAction(argv);
